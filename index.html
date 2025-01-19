@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Currency Converter</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="converter-container">
+        <h1 class="title">Currency Converter</h1>
+        <button id="themeToggle" class="theme-toggle">Switch to Light Mode</button>
+        <div class="converter-box">
+            <div class="amount-section">
+                <label for="amount">Amount:</label>
+                <input type="number" id="amount" placeholder="Enter amount">
+            </div>
+            <div class="dropdown-section">
+                <div class="dropdown-wrapper">
+                    <label for="fromCurrency">From:</label>
+                    <div class="custom-select">
+                        <img id="fromFlag" class="flag" alt="From Flag">
+                        <select id="fromCurrency"></select>
+                    </div>
+                </div>
+                <div class="dropdown-wrapper">
+                    <label for="toCurrency">To:</label>
+                    <div class="custom-select">
+                        <img id="toFlag" class="flag" alt="To Flag">
+                        <select id="toCurrency"></select>
+                    </div>
+                </div>
+            </div>
+            <div class="rate-section">
+                <p id="exchangeRate" class="exchange-rate">Exchange rate will be shown here.</p>
+            </div>
+            <button id="convertBtn">Convert</button>
+            <div id="result" class="result">Converted amount will appear here.</div>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
