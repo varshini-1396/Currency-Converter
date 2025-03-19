@@ -5,39 +5,110 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Currency Converter</title>
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
-<body>
-    <div class="converter-container">
+<body class="light-mode">
+    <div class="container">
+        <div class="theme-toggle">
+            <input type="checkbox" id="theme-switch">
+            <label for="theme-switch">
+                <i class="fas fa-sun"></i>
+                <i class="fas fa-moon"></i>
+                <span class="ball"></span>
+            </label>
+        </div>
+    
         <h1 class="title">Currency Converter</h1>
-        <button id="themeToggle" class="theme-toggle">Switch to Light Mode</button>
-        <div class="converter-box">
-            <div class="amount-section">
-                <label for="amount">Amount:</label>
-                <input type="number" id="amount" placeholder="Enter amount">
+        <div class="card">
+            <div class="amount-container">
+                <label for="amount">Amount</label>
+                <input type="number" id="amount" placeholder="Enter amount" value="1">
             </div>
-            <div class="dropdown-section">
-                <div class="dropdown-wrapper">
-                    <label for="fromCurrency">From:</label>
-                    <div class="custom-select">
-                        <img id="fromFlag" class="flag" alt="From Flag">
-                        <select id="fromCurrency"></select>
+
+            <div class="currency-rows">
+                <!-- From Currency -->
+                <div class="currency-row">
+                    <label>From</label>
+                    <div class="currency-selector">
+                        <div class="selected-currency" id="from-selected">
+                            <img src="https://flagcdn.com/w40/us.png" alt="USD" class="flag">
+                            <span class="currency-code">USD</span>
+                            <span class="currency-name">US Dollar</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                        <div class="dropdown" id="from-dropdown">
+                            <div class="search-container">
+                                <input type="text" class="search-input" placeholder="Search currency...">
+                            </div>
+                            <div class="currency-list" id="from-currency-list">
+                                <!-- Currency options will be inserted here by JavaScript -->
+                            </div>
+                        </div>
                     </div>
                 </div>
-                <div class="dropdown-wrapper">
-                    <label for="toCurrency">To:</label>
-                    <div class="custom-select">
-                        <img id="toFlag" class="flag" alt="To Flag">
-                        <select id="toCurrency"></select>
+
+                <!-- Swap Button -->
+                <div class="swap-container">
+                    <button id="swap-button" class="swap-button">
+                        <i class="fas fa-exchange-alt"></i>
+                    </button>
+                </div>
+
+                <!-- To Currency -->
+                <div class="currency-row">
+                    <label>To</label>
+                    <div class="currency-selector">
+                        <div class="selected-currency" id="to-selected">
+                            <img src="https://flagcdn.com/w40/eu.png" alt="EUR" class="flag">
+                            <span class="currency-code">EUR</span>
+                            <span class="currency-name">Euro</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                        <div class="dropdown" id="to-dropdown">
+                            <div class="search-container">
+                                <input type="text" class="search-input" placeholder="Search currency...">
+                            </div>
+                            <div class="currency-list" id="to-currency-list">
+                                <!-- Currency options will be inserted here by JavaScript -->
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
-            <div class="rate-section">
-                <p id="exchangeRate" class="exchange-rate">Exchange rate will be shown here.</p>
+
+            <button id="convert-button" class="convert-button">
+                <span>Convert</span>
+                <i class="fas fa-arrow-right"></i>
+            </button>
+
+            <div class="result" id="result">
+                <div class="result-container">
+                    <span class="amount-text">1 USD = </span>
+                    <span class="converted-amount">0.91 EUR</span>
+                </div>
+                <div class="update-time">Last updated: <span id="update-time">Just now</span></div>
             </div>
-            <button id="convertBtn">Convert</button>
-            <div id="result" class="result">Converted amount will appear here.</div>
+
+            <div class="loader">
+                <svg class="circular-loader" viewBox="25 25 50 50">
+                    <circle class="loader-path" cx="50" cy="50" r="20"></circle>
+                </svg>
+            </div>
+        </div>
+
+        <div class="history-container">
+            <h2>Conversion History</h2>
+            <div class="history-list" id="history-list">
+                <!-- History items will be added here -->
+            </div>
         </div>
     </div>
+
+    <footer>
+        <p>Exchange rates provided by <a href="https://www.exchangerate-api.com" target="_blank">ExchangeRate-API</a></p>
+    </footer>
+
     <script src="script.js"></script>
 </body>
 </html>
