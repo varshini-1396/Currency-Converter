@@ -3,111 +3,186 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Currency Converter</title>
+    <title>Currency Exchange</title>
     <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body class="light-mode">
-    <div class="container">
-        <div class="theme-toggle">
-            <input type="checkbox" id="theme-switch">
-            <label for="theme-switch">
-                <i class="fas fa-sun"></i>
-                <i class="fas fa-moon"></i>
-                <span class="ball"></span>
-            </label>
-        </div>
-    
-        <h1 class="title">Currency Converter</h1>
-        <div class="card">
-            <div class="amount-container">
-                <label for="amount">Amount</label>
-                <input type="number" id="amount" placeholder="Enter amount" value="1">
+    <div class="app-container">
+        <!-- Header -->
+        <header class="app-header">
+            <div class="header-content">
+                <div class="logo">
+                    <div class="logo-icon">
+                        <i class="fas fa-coins"></i>
+                    </div>
+                    <h1>CurrencyX</h1>
+                </div>
+                
+                <div class="theme-toggle">
+                    <input type="checkbox" id="theme-switch">
+                    <label for="theme-switch" class="toggle-label">
+                        <div class="toggle-slider">
+                            <i class="fas fa-sun sun-icon"></i>
+                            <i class="fas fa-moon moon-icon"></i>
+                        </div>
+                    </label>
+                </div>
             </div>
+        </header>
 
-            <div class="currency-rows">
-                <!-- From Currency -->
-                <div class="currency-row">
-                    <label>From</label>
-                    <div class="currency-selector">
-                        <div class="selected-currency" id="from-selected">
-                            <img src="https://flagcdn.com/w40/us.png" alt="USD" class="flag">
-                            <span class="currency-code">USD</span>
-                            <span class="currency-name">US Dollar</span>
-                            <i class="fas fa-chevron-down"></i>
-                        </div>
-                        <div class="dropdown" id="from-dropdown">
-                            <div class="search-container">
-                                <input type="text" class="search-input" placeholder="Search currency...">
-                            </div>
-                            <div class="currency-list" id="from-currency-list">
-                                <!-- Currency options will be inserted here by JavaScript -->
-                            </div>
-                        </div>
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Converter Card -->
+            <div class="converter-card">
+                <div class="card-header">
+                    <h2>Currency Converter</h2>
+                    <div class="live-indicator">
+                        <div class="pulse-dot"></div>
+                        <span>Live Rates</span>
                     </div>
                 </div>
 
-                <!-- Swap Button -->
-                <div class="swap-container">
-                    <button id="swap-button" class="swap-button">
-                        <i class="fas fa-exchange-alt"></i>
+                <div class="converter-form">
+                    <!-- Amount Input -->
+                    <div class="input-group">
+                        <label for="amount">Amount</label>
+                        <div class="amount-input-wrapper">
+                            <input type="number" id="amount" placeholder="0.00" value="1" min="0" step="0.01">
+                            <div class="input-decoration"></div>
+                        </div>
+                    </div>
+
+                    <!-- Currency Selection -->
+                    <div class="currency-section">
+                        <!-- From Currency -->
+                        <div class="currency-group">
+                            <label>From</label>
+                            <div class="currency-selector" id="from-selector">
+                                <div class="selected-currency" id="from-selected">
+                                    <div class="currency-info">
+                                        <img src="https://flagcdn.com/w40/us.png" alt="USD" class="flag">
+                                        <div class="currency-details">
+                                            <span class="currency-code">USD</span>
+                                            <span class="currency-name">US Dollar</span>
+                                        </div>
+                                    </div>
+                                    <i class="fas fa-chevron-down dropdown-arrow"></i>
+                                </div>
+                                <div class="dropdown" id="from-dropdown">
+                                    <div class="dropdown-header">
+                                        <div class="search-container">
+                                            <i class="fas fa-search search-icon"></i>
+                                            <input type="text" class="search-input" placeholder="Search currencies...">
+                                        </div>
+                                    </div>
+                                    <div class="currency-list" id="from-currency-list"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Swap Button -->
+                        <div class="swap-container">
+                            <button id="swap-button" class="swap-button">
+                                <i class="fas fa-exchange-alt"></i>
+                            </button>
+                        </div>
+
+                        <!-- To Currency -->
+                        <div class="currency-group">
+                            <label>To</label>
+                            <div class="currency-selector" id="to-selector">
+                                <div class="selected-currency" id="to-selected">
+                                    <div class="currency-info">
+                                        <img src="https://flagcdn.com/w40/eu.png" alt="EUR" class="flag">
+                                        <div class="currency-details">
+                                            <span class="currency-code">EUR</span>
+                                            <span class="currency-name">Euro</span>
+                                        </div>
+                                    </div>
+                                    <i class="fas fa-chevron-down dropdown-arrow"></i>
+                                </div>
+                                <div class="dropdown" id="to-dropdown">
+                                    <div class="dropdown-header">
+                                        <div class="search-container">
+                                            <i class="fas fa-search search-icon"></i>
+                                            <input type="text" class="search-input" placeholder="Search currencies...">
+                                        </div>
+                                    </div>
+                                    <div class="currency-list" id="to-currency-list"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Convert Button -->
+                    <button id="convert-button" class="convert-button">
+                        <span class="button-text">Convert Currency</span>
+                        <div class="button-icon">
+                            <i class="fas fa-arrow-right"></i>
+                        </div>
                     </button>
-                </div>
 
-                <!-- To Currency -->
-                <div class="currency-row">
-                    <label>To</label>
-                    <div class="currency-selector">
-                        <div class="selected-currency" id="to-selected">
-                            <img src="https://flagcdn.com/w40/eu.png" alt="EUR" class="flag">
-                            <span class="currency-code">EUR</span>
-                            <span class="currency-name">Euro</span>
-                            <i class="fas fa-chevron-down"></i>
-                        </div>
-                        <div class="dropdown" id="to-dropdown">
-                            <div class="search-container">
-                                <input type="text" class="search-input" placeholder="Search currency...">
+                    <!-- Result Display -->
+                    <div class="result-section" id="result">
+                        <div class="result-card">
+                            <div class="result-main">
+                                <div class="conversion-display">
+                                    <span class="from-amount">1 USD</span>
+                                    <i class="fas fa-equals equals-icon"></i>
+                                    <span class="to-amount">0.91 EUR</span>
+                                </div>
+                                <div class="exchange-rate">
+                                    <span>1 USD = 0.91 EUR</span>
+                                </div>
                             </div>
-                            <div class="currency-list" id="to-currency-list">
-                                <!-- Currency options will be inserted here by JavaScript -->
+                            <div class="result-meta">
+                                <div class="update-info">
+                                    <i class="fas fa-clock"></i>
+                                    <span id="update-time">Just now</span>
+                                </div>
                             </div>
                         </div>
+                    </div>
+
+                    <!-- Loading State -->
+                    <div class="loading-overlay">
+                        <div class="loading-spinner">
+                            <div class="spinner-ring"></div>
+                            <div class="spinner-ring"></div>
+                            <div class="spinner-ring"></div>
+                        </div>
+                        <span class="loading-text">Fetching latest rates...</span>
                     </div>
                 </div>
             </div>
 
-            <button id="convert-button" class="convert-button">
-                <span>Convert</span>
-                <i class="fas fa-arrow-right"></i>
-            </button>
-
-            <div class="result" id="result">
-                <div class="result-container">
-                    <span class="amount-text">1 USD = </span>
-                    <span class="converted-amount">0.91 EUR</span>
+            <!-- History Section -->
+            <div class="history-section">
+                <div class="section-header">
+                    <h3>Recent Conversions</h3>
+                    <div class="history-count">
+                        <span id="history-count">0</span>
+                    </div>
                 </div>
-                <div class="update-time">Last updated: <span id="update-time">Just now</span></div>
+                <div class="history-content">
+                    <div class="history-list" id="history-list">
+                        <div class="empty-history">
+                            <i class="fas fa-history"></i>
+                            <p>No conversions yet</p>
+                            <span>Your conversion history will appear here</span>
+                        </div>
+                    </div>
+                </div>
             </div>
+        </main>
 
-            <div class="loader">
-                <svg class="circular-loader" viewBox="25 25 50 50">
-                    <circle class="loader-path" cx="50" cy="50" r="20"></circle>
-                </svg>
-            </div>
-        </div>
-
-        <div class="history-container">
-            <h2>Conversion History</h2>
-            <div class="history-list" id="history-list">
-                <!-- History items will be added here -->
-            </div>
-        </div>
+        <!-- Footer -->
+        <footer class="app-footer">
+            <p>Powered by <a href="https://www.exchangerate-api.com" target="_blank">ExchangeRate-API</a></p>
+        </footer>
     </div>
-
-    <footer>
-        <p>Exchange rates provided by <a href="https://www.exchangerate-api.com" target="_blank">ExchangeRate-API</a></p>
-    </footer>
 
     <script src="script.js"></script>
 </body>

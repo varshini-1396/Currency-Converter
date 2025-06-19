@@ -1,68 +1,4 @@
 document.addEventListener('DOMContentLoaded', function() {
-    // Create background animation elements
-    function createBackgroundAnimations() {
-        const bgAnimation = document.createElement('div');
-        bgAnimation.className = 'bg-animation';
-        document.body.appendChild(bgAnimation);
-        
-        // Add currency symbols
-        const currencySymbols = ['$', '€', '£', '¥', '₹', '₽', '₣', '₴', '₦', '₩', '฿', '₱'];
-        
-        // Create 20 currency symbols
-        for (let i = 0; i < 20; i++) {
-            const symbol = document.createElement('div');
-            symbol.className = 'currency-symbol';
-            symbol.textContent = currencySymbols[Math.floor(Math.random() * currencySymbols.length)];
-            
-            // Random position
-            const posX = Math.random() * 100;
-            symbol.style.left = `${posX}%`;
-            
-            // Random size
-            const size = Math.random() * 30 + 20;
-            symbol.style.fontSize = `${size}px`;
-            
-            // Random animation duration
-            const duration = Math.random() * 15 + 10;
-            symbol.style.setProperty('--float-duration', `${duration}s`);
-            
-            // Random rotation
-            const rotation = Math.random() * 360;
-            symbol.style.setProperty('--rotation', `${rotation}deg`);
-            
-            // Random opacity
-            const opacity = Math.random() * 0.06 + 0.02;
-            symbol.style.setProperty('--symbol-opacity', opacity);
-            
-            // Random delay
-            symbol.style.animationDelay = `${Math.random() * duration}s`;
-            
-            bgAnimation.appendChild(symbol);
-        }
-        
-        // Add ripple effects
-        for (let i = 0; i < 3; i++) {
-            const ripple = document.createElement('div');
-            ripple.className = 'ripple';
-            
-            // Random position
-            const posX = Math.random() * 80 + 10;
-            const posY = Math.random() * 80 + 10;
-            ripple.style.left = `${posX}%`;
-            ripple.style.top = `${posY}%`;
-            
-            // Random animation duration and delay
-            const duration = Math.random() * 8 + 8;
-            ripple.style.setProperty('--ripple-duration', `${duration}s`);
-            ripple.style.animationDelay = `${Math.random() * duration}s`;
-            
-            bgAnimation.appendChild(ripple);
-        }
-    }
-    
-    // Call to create background animations
-    createBackgroundAnimations();
-
     // DOM Elements
     const themeSwitch = document.getElementById('theme-switch');
     const fromSelected = document.getElementById('from-selected');
@@ -74,12 +10,14 @@ document.addEventListener('DOMContentLoaded', function() {
     const swapButton = document.getElementById('swap-button');
     const convertButton = document.getElementById('convert-button');
     const amountInput = document.getElementById('amount');
-    const resultContainer = document.getElementById('result');
-    const amountText = document.querySelector('.amount-text');
-    const convertedAmount = document.querySelector('.converted-amount');
+    const resultSection = document.getElementById('result');
+    const fromAmountSpan = document.querySelector('.from-amount');
+    const toAmountSpan = document.querySelector('.to-amount');
+    const exchangeRateSpan = document.querySelector('.exchange-rate span');
     const updateTimeElement = document.getElementById('update-time');
-    const loader = document.querySelector('.loader');
+    const loadingOverlay = document.querySelector('.loading-overlay');
     const historyList = document.getElementById('history-list');
+    const historyCount = document.getElementById('history-count');
     const searchInputs = document.querySelectorAll('.search-input');
 
     // State
@@ -110,7 +48,17 @@ document.addEventListener('DOMContentLoaded', function() {
         { code: 'TRY', name: 'Turkish Lira', flag: 'tr' },
         { code: 'ZAR', name: 'South African Rand', flag: 'za' },
         { code: 'SEK', name: 'Swedish Krona', flag: 'se' },
-        { code: 'NOK', name: 'Norwegian Krone', flag: 'no' }
+        { code: 'NOK', name: 'Norwegian Krone', flag: 'no' },
+        { code: 'DKK', name: 'Danish Krone', flag: 'dk' },
+        { code: 'PLN', name: 'Polish Zloty', flag: 'pl' },
+        { code: 'CZK', name: 'Czech Koruna', flag: 'cz' },
+        { code: 'HUF', name: 'Hungarian Forint', flag: 'hu' },
+        { code: 'ILS', name: 'Israeli Shekel', flag: 'il' },
+        { code: 'AED', name: 'UAE Dirham', flag: 'ae' },
+        { code: 'SAR', name: 'Saudi Riyal', flag: 'sa' },
+        { code: 'THB', name: 'Thai Baht', flag: 'th' },
+        { code: 'MYR', name: 'Malaysian Ringgit', flag: 'my' },
+        { code: 'PHP', name: 'Philippine Peso', flag: 'ph' }
     ];
 
     // Initialize theme from local storage
@@ -132,7 +80,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // Initialize currency dropdowns
-    function populateCurrencyList(listElement, selectedCurrency, isFrom) {
+    function populateCurrencyList(listElement, isFrom) {
         listElement.innerHTML = '';
         
         currencies.forEach(currency => {
@@ -166,15 +114,19 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function updateSelectedCurrency(element, currency) {
-        element.querySelector('.flag').src = `https://flagcdn.com/w40/${currency.flag}.png`;
-        element.querySelector('.flag').alt = currency.code;
-        element.querySelector('.currency-code').textContent = currency.code;
-        element.querySelector('.currency-name').textContent = currency.name;
+        const flag = element.querySelector('.flag');
+        const code = element.querySelector('.currency-code');
+        const name = element.querySelector('.currency-name');
+        
+        flag.src = `https://flagcdn.com/w40/${currency.flag}.png`;
+        flag.alt = currency.code;
+        code.textContent = currency.code;
+        name.textContent = currency.name;
     }
 
     // Initialize dropdowns
-    populateCurrencyList(fromCurrencyList, fromCurrency, true);
-    populateCurrencyList(toCurrencyList, toCurrency, false);
+    populateCurrencyList(fromCurrencyList, true);
+    populateCurrencyList(toCurrencyList, false);
 
     // Update selected currencies to initial values
     const fromCurrencyObj = currencies.find(c => c.code === fromCurrency);
@@ -185,16 +137,26 @@ document.addEventListener('DOMContentLoaded', function() {
     // Toggle dropdowns
     fromSelected.addEventListener('click', function(e) {
         e.stopPropagation();
+        const fromSelector = document.getElementById('from-selector');
+        const toSelector = document.getElementById('to-selector');
+        
         fromDropdown.classList.toggle('active');
+        fromSelector.classList.toggle('active');
+        
         toDropdown.classList.remove('active');
-        fromSelected.querySelector('i').style.transform = fromDropdown.classList.contains('active') ? 'rotate(180deg)' : '';
+        toSelector.classList.remove('active');
     });
 
     toSelected.addEventListener('click', function(e) {
         e.stopPropagation();
+        const fromSelector = document.getElementById('from-selector');
+        const toSelector = document.getElementById('to-selector');
+        
         toDropdown.classList.toggle('active');
+        toSelector.classList.toggle('active');
+        
         fromDropdown.classList.remove('active');
-        toSelected.querySelector('i').style.transform = toDropdown.classList.contains('active') ? 'rotate(180deg)' : '';
+        fromSelector.classList.remove('active');
     });
 
     document.addEventListener('click', closeDropdowns);
@@ -202,8 +164,8 @@ document.addEventListener('DOMContentLoaded', function() {
     function closeDropdowns() {
         fromDropdown.classList.remove('active');
         toDropdown.classList.remove('active');
-        fromSelected.querySelector('i').style.transform = '';
-        toSelected.querySelector('i').style.transform = '';
+        document.getElementById('from-selector').classList.remove('active');
+        document.getElementById('to-selector').classList.remove('active');
     }
 
     // Search functionality
@@ -240,9 +202,9 @@ document.addEventListener('DOMContentLoaded', function() {
         updateSelectedCurrency(toSelected, tempCurrencyObj);
         
         // Animate swap button
-        this.classList.add('rotate');
+        this.style.transform = 'rotate(180deg) scale(1.1)';
         setTimeout(() => {
-            this.classList.remove('rotate');
+            this.style.transform = '';
             
             // Update conversion if we have rates
             if (Object.keys(exchangeRates).length > 0) {
@@ -251,27 +213,11 @@ document.addEventListener('DOMContentLoaded', function() {
         }, 300);
     });
 
-    // Add rotate animation for swap
-    const style = document.createElement('style');
-    style.textContent = `
-        .rotate {
-            animation: rotateAnimation 0.3s ease;
-        }
-        
-        @keyframes rotateAnimation {
-            0% { transform: scale(1) rotate(0); }
-            50% { transform: scale(1.2) rotate(180deg); }
-            100% { transform: scale(1) rotate(360deg); }
-        }
-    `;
-    document.head.appendChild(style);
-
     // Fetch exchange rates
     async function fetchExchangeRates() {
         showLoader();
         
         try {
-            // For educational purposes only - in a real application, you should use your own API key
             const response = await fetch(`https://open.er-api.com/v6/latest/${fromCurrency}`);
             const data = await response.json();
             
@@ -286,7 +232,7 @@ document.addEventListener('DOMContentLoaded', function() {
         } catch (error) {
             console.error('Error fetching exchange rates:', error);
             hideLoader();
-            alert('Failed to fetch exchange rates. Please try again later.');
+            showNotification('Failed to fetch exchange rates. Please try again later.', 'error');
         }
     }
 
@@ -298,17 +244,32 @@ document.addEventListener('DOMContentLoaded', function() {
             const rate = exchangeRates[toCurrency];
             const result = amount * rate;
             
-            amountText.textContent = `${amount} ${fromCurrency} = `;
-            convertedAmount.textContent = `${result.toFixed(2)} ${toCurrency}`;
+            // Update display
+            fromAmountSpan.textContent = `${formatNumber(amount)} ${fromCurrency}`;
+            toAmountSpan.textContent = `${formatNumber(result)} ${toCurrency}`;
+            exchangeRateSpan.textContent = `1 ${fromCurrency} = ${formatNumber(rate)} ${toCurrency}`;
             
             updateTimeElement.textContent = getTimeDifference(lastFetchTime);
             
-            resultContainer.classList.add('active');
+            resultSection.classList.add('active');
             
             // Add to history
-            addToHistory(amount, fromCurrency, result.toFixed(2), toCurrency);
+            addToHistory(amount, fromCurrency, result, toCurrency, rate);
         } else {
-            resultContainer.classList.remove('active');
+            resultSection.classList.remove('active');
+        }
+    }
+
+    // Format numbers for display
+    function formatNumber(num) {
+        if (num >= 1000000) {
+            return (num / 1000000).toFixed(2) + 'M';
+        } else if (num >= 1000) {
+            return (num / 1000).toFixed(2) + 'K';
+        } else if (num < 0.01 && num > 0) {
+            return num.toExponential(2);
+        } else {
+            return num.toFixed(2);
         }
     }
 
@@ -317,39 +278,94 @@ document.addEventListener('DOMContentLoaded', function() {
         if (!date) return 'N/A';
         
         const now = new Date();
-        const diff = Math.floor((now - date) / 1000); // difference in seconds
+        const diff = Math.floor((now - date) / 1000);
         
         if (diff < 60) return 'Just now';
-        if (diff < 3600) return `${Math.floor(diff / 60)} minutes ago`;
-        if (diff < 86400) return `${Math.floor(diff / 3600)} hours ago`;
-        return `${Math.floor(diff / 86400)} days ago`;
+        if (diff < 3600) return `${Math.floor(diff / 60)}m ago`;
+        if (diff < 86400) return `${Math.floor(diff / 3600)}h ago`;
+        return `${Math.floor(diff / 86400)}d ago`;
     }
 
     // Loader functions
     function showLoader() {
-        loader.style.display = 'flex';
+        loadingOverlay.style.display = 'flex';
     }
 
     function hideLoader() {
-        loader.style.display = 'none';
+        loadingOverlay.style.display = 'none';
+    }
+
+    // Show notification
+    function showNotification(message, type = 'info') {
+        const notification = document.createElement('div');
+        notification.className = `notification notification-${type}`;
+        notification.textContent = message;
+        
+        const style = document.createElement('style');
+        style.textContent = `
+            .notification {
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                padding: 1rem 1.5rem;
+                border-radius: 8px;
+                color: white;
+                font-weight: 500;
+                z-index: 1000;
+                animation: slideIn 0.3s ease;
+            }
+            .notification-error {
+                background: #ef4444;
+            }
+            .notification-success {
+                background: #10b981;
+            }
+            .notification-info {
+                background: #6366f1;
+            }
+            @keyframes slideIn {
+                from { transform: translateX(100%); opacity: 0; }
+                to { transform: translateX(0); opacity: 1; }
+            }
+        `;
+        
+        if (!document.querySelector('style[data-notifications]')) {
+            style.setAttribute('data-notifications', 'true');
+            document.head.appendChild(style);
+        }
+        
+        document.body.appendChild(notification);
+        
+        setTimeout(() => {
+            notification.style.animation = 'slideIn 0.3s ease reverse';
+            setTimeout(() => notification.remove(), 300);
+        }, 3000);
     }
 
     // Add to conversion history
-    function addToHistory(fromAmount, fromCurrency, toAmount, toCurrency) {
+    function addToHistory(fromAmount, fromCurrency, toAmount, toCurrency, rate) {
         const historyItem = {
             id: Date.now(),
-            fromAmount,
+            fromAmount: parseFloat(fromAmount.toFixed(2)),
             fromCurrency,
-            toAmount,
+            toAmount: parseFloat(toAmount.toFixed(2)),
             toCurrency,
+            rate: parseFloat(rate.toFixed(4)),
             date: new Date()
         };
         
+        // Remove duplicate if exists
+        conversionHistory = conversionHistory.filter(item => 
+            !(item.fromCurrency === fromCurrency && 
+              item.toCurrency === toCurrency && 
+              item.fromAmount === historyItem.fromAmount)
+        );
+        
         conversionHistory.unshift(historyItem);
         
-        // Limit history to 10 items
-        if (conversionHistory.length > 10) {
-            conversionHistory.pop();
+        // Limit history to 15 items
+        if (conversionHistory.length > 15) {
+            conversionHistory = conversionHistory.slice(0, 15);
         }
         
         // Save to localStorage
@@ -361,27 +377,32 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Render conversion history
     function renderHistory() {
-        historyList.innerHTML = '';
+        historyCount.textContent = conversionHistory.length;
         
         if (conversionHistory.length === 0) {
-            const emptyMessage = document.createElement('div');
-            emptyMessage.textContent = 'No conversion history yet';
-            emptyMessage.style.color = 'var(--text-light)';
-            emptyMessage.style.textAlign = 'center';
-            emptyMessage.style.padding = '15px';
-            historyList.appendChild(emptyMessage);
+            historyList.innerHTML = `
+                <div class="empty-history">
+                    <i class="fas fa-history"></i>
+                    <p>No conversions yet</p>
+                    <span>Your conversion history will appear here</span>
+                </div>
+            `;
             return;
         }
+        
+        historyList.innerHTML = '';
         
         conversionHistory.forEach(item => {
             const historyItem = document.createElement('div');
             historyItem.className = 'history-item';
             historyItem.innerHTML = `
                 <div class="history-details">
-                    <div class="history-conversion">${item.fromAmount} ${item.fromCurrency} → ${item.toAmount} ${item.toCurrency}</div>
+                    <div class="history-conversion">
+                        ${formatNumber(item.fromAmount)} ${item.fromCurrency} → ${formatNumber(item.toAmount)} ${item.toCurrency}
+                    </div>
                     <div class="history-date">${formatDate(item.date)}</div>
                 </div>
-                <button class="history-delete" data-id="${item.id}">
+                <button class="history-delete" data-id="${item.id}" title="Delete conversion">
                     <i class="fas fa-trash"></i>
                 </button>
             `;
@@ -391,7 +412,8 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Add delete listeners
         document.querySelectorAll('.history-delete').forEach(button => {
-            button.addEventListener('click', function() {
+            button.addEventListener('click', function(e) {
+                e.stopPropagation();
                 const id = parseInt(this.getAttribute('data-id'));
                 deleteHistoryItem(id);
             });
@@ -401,7 +423,14 @@ document.addEventListener('DOMContentLoaded', function() {
     // Format date for history
     function formatDate(dateString) {
         const date = new Date(dateString);
-        return date.toLocaleString('en-US', {
+        const now = new Date();
+        const diff = now - date;
+        
+        if (diff < 60000) return 'Just now';
+        if (diff < 3600000) return `${Math.floor(diff / 60000)}m ago`;
+        if (diff < 86400000) return `${Math.floor(diff / 3600000)}h ago`;
+        
+        return date.toLocaleDateString('en-US', {
             month: 'short',
             day: 'numeric',
             hour: '2-digit',
@@ -414,6 +443,7 @@ document.addEventListener('DOMContentLoaded', function() {
         conversionHistory = conversionHistory.filter(item => item.id !== id);
         localStorage.setItem('conversionHistory', JSON.stringify(conversionHistory));
         renderHistory();
+        showNotification('Conversion deleted', 'success');
     }
 
     // Convert button click event
@@ -429,55 +459,55 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         
         // Add button animation
-        this.classList.add('pulse');
-        setTimeout(() => this.classList.remove('pulse'), 500);
+        this.style.transform = 'scale(0.98)';
+        setTimeout(() => {
+            this.style.transform = '';
+        }, 150);
     });
 
-    // Add pulse animation for convert button
-    const pulseStyle = document.createElement('style');
-    pulseStyle.textContent = `
-        .pulse {
-            animation: pulseAnimation 0.5s ease;
+    // Enter key support for amount input
+    amountInput.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            convertButton.click();
         }
-        
-        @keyframes pulseAnimation {
-            0% { transform: scale(1); }
-            50% { transform: scale(0.97); }
-            100% { transform: scale(1); }
-        }
-    `;
-    document.head.appendChild(pulseStyle);
+    });
 
-    // Initial data load
+    // Auto-convert on amount change (with debounce)
+    let convertTimeout;
+    amountInput.addEventListener('input', function() {
+        clearTimeout(convertTimeout);
+        convertTimeout = setTimeout(() => {
+            if (Object.keys(exchangeRates).length > 0) {
+                performConversion();
+            }
+        }, 500);
+    });
+
+    // Initialize the app
     function init() {
-        // Load conversion history
         renderHistory();
         
         // Fetch initial exchange rates
         fetchExchangeRates();
         
-        // Add input animations
-        amountInput.addEventListener('focus', function() {
-            this.parentElement.classList.add('focused');
-        });
+        // Add smooth scroll behavior
+        document.documentElement.style.scrollBehavior = 'smooth';
         
-        amountInput.addEventListener('blur', function() {
-            this.parentElement.classList.remove('focused');
-        });
-        
-        const inputStyle = document.createElement('style');
-        inputStyle.textContent = `
-            .focused {
-                animation: focusAnimation 0.3s forwards;
+        // Add keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            // Ctrl/Cmd + Enter to convert
+            if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+                convertButton.click();
             }
             
-            @keyframes focusAnimation {
-                0% { transform: translateY(0); }
-                50% { transform: translateY(-2px); }
-                100% { transform: translateY(0); }
+            // Ctrl/Cmd + S to swap
+            if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+                e.preventDefault();
+                swapButton.click();
             }
-        `;
-        document.head.appendChild(inputStyle);
+        });
+        
+        console.log('CurrencyX initialized successfully!');
     }
 
     // Initialize the app
